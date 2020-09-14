@@ -4,20 +4,18 @@
       :style="{
         backgroundColor: dark ? '#1e1e1e' : null,
         transition: 'all .1s'
-      }"
-    >
+      }">
       <Navbar :dark="dark" @toggle-dark="toggleDark" />
       <v-container>
         <v-card :dark="dark" flat max-width="550px" class="mx-auto">
           <h1 class="display-1 mb-4 ml-12">Turn: {{ turn ? 'X' : 'O' }}</h1>
-          <v-row justify="center" no-gutters v-for="(row, x) in grid" :key="x">
+          <v-row justify="center" no-gutters>
             <v-col
               align-self="center"
-              cols="3"
-              v-for="(box, y) in row"
-              :key="y"
-            >
-              <VBox @click="fillBox({ x, y })" :filled="box" />
+              cols="4"
+              v-for="(box, i) in grid"
+              :key="i">
+              <VBox @click="fillBox(i)" :filled="box" />
             </v-col>
           </v-row>
         </v-card>
@@ -25,7 +23,11 @@
       <v-overlay :value="loading">
         <v-progress-circular indeterminate size="64" />
       </v-overlay>
-      <VWinnerOverlay :dark="dark" :value="!!winner" :winner="winner" @close="winner = ''"/>
+      <VWinnerOverlay
+        :dark="dark"
+        :value="!!winner"
+        :winner="winner"
+        @close="winner = ''"/>
     </v-main>
   </v-app>
 </template>
@@ -40,7 +42,7 @@ export default {
   components: {
     VBox,
     Navbar,
-    VWinnerOverlay,
+    VWinnerOverlay
   },
   data() {
     return {
@@ -51,7 +53,7 @@ export default {
       // True standing for X and false is for O
       turn: true,
       startWatching: false,
-      winner: '',
+      winner: ''
     };
   },
   watch: {
@@ -64,9 +66,9 @@ export default {
   },
   methods: {
     fillBox(pos) {
-      if (this.grid[pos.x][pos.y]) return;
+      if (this.grid[pos]) return;
       this.history.push(this.grid);
-      this.grid[pos.x][pos.y] = this.turn ? 'X' : 'O';
+      this.grid[pos] = this.turn ? 'X' : 'O';
       if (this.checkWinner()) {
         this.winner = this.turn ? 'X' : 'O';
         this.startWatching = true;
@@ -84,26 +86,47 @@ export default {
     initGrid() {
       this.history = [];
       this.turn = true;
-      const array = Array.from({ length: 3 }, () => Array.from({ length: 3 }));
+      const array = Array.from({ length: 9 });
       this.grid = array;
       this.history.push(array);
     },
     checkWinner() {
+      // Horizontal row checks
+      for (let i = 0; i < 9; i += 3) {
+        if (
+          this.grid[i] != null &&
+          this.grid[i + 1] != null &&
+          this.grid[i + 2] != null
+        ) {
+          if (
+            this.grid[i] == this.grid[i + 1] &&
+            this.grid[i + 1] == this.grid[i + 2]
+          )
+            return true;
+        }
+      }
+      // Vertical row checks
       for (let i = 0; i < 3; i++) {
         if (
-          this.grid[i][0] == this.grid[i][1] &&
-          this.grid[i][1] == this.grid[i][2] &&
-          (this.grid[i][0] || this.grid[i][1] || this.grid[i][2]) !== undefined
+          this.grid[i] != null &&
+          this.grid[i + 3] != null &&
+          this.grid[i + 6] != null
         ) {
-          return true;
+          if (
+            this.grid[i] == this.grid[i + 3] &&
+            this.grid[i + 3] == this.grid[i + 6]
+          )
+            return true;
         }
-        if (
-          this.grid[0][i] == this.grid[1][i] &&
-          this.grid[1][i] == this.grid[2][i] &&
-          (this.grid[0][i] || this.grid[1][i] || this.grid[2][i]) !== undefined
-        ) {
+      }
+      // Diagonal row checks
+      if (
+        this.grid[0] != null &&
+        this.grid[4] != null &&
+        this.grid[8] != null
+      ) {
+        if (this.grid[0] == this.grid[4] && this.grid[4] == this.grid[8])
           return true;
-        }
       }
       return false;
     },

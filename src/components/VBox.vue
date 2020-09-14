@@ -1,7 +1,7 @@
 <template>
-  <v-card @click="$emit('click')" outlined tile height="6rem">
+  <v-card @click="$emit('click')" outlined tile height="7rem">
     <div class="text-center">
-      <h1 class="mt-4">
+      <h1 class="mt-8">
         {{ filled }}
       </h1>
     </div>

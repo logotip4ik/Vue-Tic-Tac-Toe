@@ -1,5 +1,5 @@
 <template>
-  <v-dialog draggable :dark="dark" v-model="show" max-width="400px">
+  <v-dialog :dark="dark" v-model="show" max-width="400px">
     <v-card :dark="dark" max-width="400px">
       <v-card-title key="title" v-if="winner !== 'None'">Player {{winner}} win 🎉</v-card-title>
       <v-card-title key="title" v-else>This is Draw 👍</v-card-title>
